@@ -1,0 +1,614 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="nk-block-head nk-block-head-sm">
+    <div class="nk-block-between">
+        <div class="nk-block-head-content">
+            <h3 class="nk-block-title page-title">Admin Dashboard</h3>
+            <div class="nk-block-des text-soft">
+                <p>Welcome to your admin dashboard.</p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="nk-block">
+    <div class="row g-gs">
+        <div class="col-sm-6 col-lg-3">
+            <div class="card card-bordered card-full hover-shadow">
+                <div class="card-inner">
+                    <div class="card-title-group align-start mb-0">
+                        <div class="card-title">
+                            <h6 class="title">Today's Bookings</h6>
+                        </div>
+                    </div>
+                    <div class="card-amount">
+                        <span class="amount ff-mono">{{ stats.todays_bookings }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="card card-bordered card-full hover-shadow">
+                <div class="card-inner">
+                    <div class="card-title-group align-start mb-0">
+                        <div class="card-title">
+                            <h6 class="title">Total Rooms</h6>
+                        </div>
+                    </div>
+                    <div class="card-amount">
+                        <span class="amount ff-mono">{{ stats.total_rooms }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="card card-bordered card-full hover-shadow">
+                <div class="card-inner">
+                    <div class="card-title-group align-start mb-0">
+                        <div class="card-title">
+                            <h6 class="title">Total Users</h6>
+                        </div>
+                    </div>
+                    <div class="card-amount">
+                        <span class="amount ff-mono">{{ stats.total_users }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 col-lg-3">
+            <div class="card card-bordered card-full hover-shadow">
+                <div class="card-inner">
+                    <div class="card-title-group align-start mb-0">
+                        <div class="card-title">
+                            <h6 class="title">Bookings This Month</h6>
+                        </div>
+                    </div>
+                    <div class="card-amount">
+                        <span class="amount ff-mono">{{ stats.bookings_this_month }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="nk-block nk-block-lg">
+    <div class="row g-gs">
+        <div class="col-xxl-6">
+            <div class="card card-full">
+                <div class="card-inner">
+                    <div class="card-title-group">
+                        <div class="card-title">
+                            <h6 class="title">Booking Trends</h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-inner pt-0">
+                    <div class="nk-ck-sm">
+                        <canvas id="bookingTrendsChart" height="300"></canvas>
+                        <p class="chart-fallback" style="display: none;">Charts could not be loaded</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xxl-6">
+            <div class="card card-full">
+                <div class="card-inner">
+                    <div class="card-title-group">
+                        <div class="card-title">
+                            <h6 class="title">Room Usage</h6>
+                            <p class="chart-fallback" style="display: none;">Charts could not be loaded</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-inner pt-0">
+                    <div class="nk-ck-sm">
+                        <canvas id="roomUsageChart" height="300"></canvas>
+                    </div>  
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="nk-block">
+    <div class="row g-gs">
+        <div class="col-lg-8">
+            <div class="card card-bordered h-100">
+                <div class="card-inner">
+                    <div class="card-title-group align-start mb-3">
+                        <div class="card-title">
+                            <h5 class="title">Room Calendar</h5>
+                        </div>
+                    </div>
+                    <div class="nk-block">
+                        <div class="room-filter mb-2">
+                            <div class="form-group">
+                                <label class="form-label">Filter Rooms:</label>
+                                <div class="form-control-wrap">
+                                    <div class="btn-group-wrap">
+                                        {% if rooms|length > 0 %}
+                                            {% for room in rooms %}
+                                            <div class="btn-group mr-1 mb-1" data-toggle="buttons">
+                                                <label class="btn btn-outline-primary btn-sm active">
+                                                    <input type="checkbox" class="room-toggle mr-1" id="room-{{ room.id }}" value="{{ room.id }}" checked autocomplete="off"> {{ room.name }}
+                                                </label>
+                                            </div>
+                                            {% endfor %}
+                                        {% else %}
+                                            <p class="no-room alert alert-danger">No rooms available</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="calendar" class="nk-calendar"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card card-bordered h-100">
+                <div class="card-inner h-100 d-flex flex-column">
+                    <div class="card-title-group align-start mb-3">
+                        <div class="card-title">
+                            <h5 class="title">Your Bookings</h5>
+                        </div>
+                    </div>
+                    <ul class="nav nav-tabs nav-tabs-mb-icon nav-tabs-card">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-toggle="tab" href="#active">
+                                <span>Active</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#upcoming">
+                                <span>Upcoming</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#past">
+                                <span>Past</span>
+                            </a>
+                        </li>
+                    </ul>
+                    <div class="tab-content flex-grow-1 overflow-auto">
+                        <div class="tab-pane active" id="active">
+                            <div class="nk-tb-list is-compact">
+                                <!-- Active bookings will be inserted here -->
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="upcoming">
+                            <div class="nk-tb-list is-compact">
+                                <!-- Upcoming bookings will be inserted here -->
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="past">
+                            <div class="nk-tb-list is-compact">
+                                <!-- Past bookings will be inserted here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Booking Modal -->
+<div class="modal fade" id="bookingModal" tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Book a Room</h5>
+                <a href="#" class="close" onclick="closeModal()" data-bs-dismiss="modal" aria-label="Close">
+                    <em class="icon ni ni-cross"></em>
+                </a>
+            </div>
+            <div class="modal-body">
+                <form id="bookingForm" class="form-validate is-alter">
+                    <input type="hidden" id="bookingDate" name="date">
+                    <div class="form-group">
+                        <label class="form-label" for="roomSelect">Room</label>
+                        <div class="form-control-wrap">
+                            <select id="roomSelect" name="room_id" class="form-select" required>
+                                {% for room in rooms %}
+                                    <option value="{{ room.id }}">{{ room.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Date</label>
+                        <div class="form-text-hint" id="dateDisplay"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Start Time</label>
+                        <div class="form-text-hint" id="startTimeDisplay"></div>
+                        <input type="hidden" id="startTime" name="start_time">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">End Time</label>
+                            <div class="form-text-hint" id="endTimeDisplay"></div>
+                            <input type="hidden" id="endTime" name="end_time">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-light" onclick="closeModal()" >Close</button>
+                <button type="button" class="btn btn-primary" id="confirmBooking">Book Room</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.js'></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    function closeModal() {
+        var modal = document.getElementById('bookingModal');
+        if (modal) {
+            // Hide the modal
+            modal.style.display = 'none';
+            modal.classList.remove('show');
+            
+            // Remove the 'modal-open' class from the body
+            document.body.classList.remove('modal-open');
+            
+            // Remove the modal backdrop
+            var backdrop = document.querySelector('.modal-backdrop');
+            if (backdrop) {
+                backdrop.parentNode.removeChild(backdrop);
+            }
+            
+            // Enable scrolling on the body
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+        }
+    }
+
+document.addEventListener('DOMContentLoaded', function() {
+
+    var colors = [
+            '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8',
+            '#F06292', '#AED581', '#FFD54F', '#4DD0E1', '#BA68C8',
+            '#FF8A65', '#9CCC65', '#FFCA28', '#26C6DA', '#AB47BC'
+        ];
+
+    function getUserColor(userId) {
+        var colors = [
+            '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8',
+            '#F06292', '#AED581', '#FFD54F', '#4DD0E1', '#BA68C8',
+            '#FF8A65', '#9CCC65', '#FFCA28', '#26C6DA', '#AB47BC'
+        ];
+        return colors[userId % colors.length];
+    }
+
+    let calendar;
+    let allEvents = [];
+
+    function initializeCalendar() {
+        calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
+            initialView: 'timeGridWeek',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            slotMinTime: '00:00:00',
+            slotMaxTime: '24:00:00',
+            allDaySlot: false,
+            selectable: true,
+            selectMirror: true,
+            dayMaxEvents: true,
+            weekNumbers: true,
+            navLinks: true,
+            nowIndicator: true,
+            businessHours: {
+                daysOfWeek: [0, 1, 2, 3, 4, 5, 6],
+                startTime: '00:00',
+                endTime: '24:00',
+            },
+            selectAllow: function(selectInfo) {
+                return selectInfo.start >= new Date();
+            },
+            select: function(info) {
+                if (info.start < new Date()) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Cannot book for past times.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                    calendar.unselect();
+                } else {
+                    openBookingModal(info);
+                }
+            },
+            events: function(info, successCallback, failureCallback) {
+                fetch('/user/api/bookings?include_all=true')
+                    .then(response => response.json())
+                    .then(data => {
+                        allEvents = data.map(booking => ({
+                            id: booking.id,
+                            title: booking.room_name,
+                            start: booking.date + 'T' + booking.start_time,
+                            end: booking.date + 'T' + booking.end_time,
+                            backgroundColor: getUserColor(booking.user_id),
+                            borderColor: getUserColor(booking.user_id),
+                            textColor: '#ffffff',
+                            extendedProps: {
+                                room_id: booking.room_id,
+                                user_id: booking.user_id,
+                                user_name: booking.user_name
+                            }
+                        }));
+                        successCallback(allEvents);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching bookings:', error);
+                        failureCallback(error);
+                    });
+            },
+            eventContent: function(arg) {
+                return {
+                    html: `<div class="fc-event-title">${arg.event.title}</div>
+                           <div class="fc-event-user">${arg.event.extendedProps.user_name}</div>`
+                };
+            },
+            eventClick: function(info) {
+                Swal.fire({
+                    title: 'Booking Details',
+                    html: `
+                        <p><strong>Room:</strong> ${info.event.title}</p>
+                        <p><strong>Start:</strong> ${info.event.start.toLocaleString()}</p>
+                        <p><strong>End:</strong> ${info.event.end.toLocaleString()}</p>
+                        <p><strong>Booked by:</strong> ${info.event.extendedProps.user_name}</p>
+                    `,
+                    icon: 'info',
+                    confirmButtonText: 'OK'
+                });
+            }
+        });
+        calendar.render();
+    }
+
+    function openBookingModal(info) {
+        const date = info.startStr.split('T')[0];
+        const startTime = info.startStr.split('T')[1].substr(0, 5);
+        const endTime = info.endStr.split('T')[1].substr(0, 5);
+
+        document.getElementById('bookingDate').value = date;
+        document.getElementById('startTime').value = startTime;
+        document.getElementById('endTime').value = endTime;
+
+        document.getElementById('dateDisplay').textContent = date;
+        document.getElementById('startTimeDisplay').textContent = startTime;
+        document.getElementById('endTimeDisplay').textContent = endTime;
+
+        // Update available rooms
+        updateAvailableRooms(date, startTime, endTime);
+
+        new bootstrap.Modal(document.getElementById('bookingModal')).show();
+    }
+
+    function updateAvailableRooms(date, startTime, endTime) {
+        const roomSelect = document.getElementById('roomSelect');
+        const selectedStart = new Date(date + 'T' + startTime);
+        const selectedEnd = new Date(date + 'T' + endTime);
+
+        // Clear existing options
+        roomSelect.innerHTML = '';
+
+        // Get all rooms
+        const allRooms = Array.from(document.querySelectorAll('.room-toggle')).map(checkbox => ({
+            id: checkbox.value,
+            name: checkbox.nextSibling.textContent.trim()
+        }));
+
+        // Filter available rooms
+        const availableRooms = allRooms.filter(room => {
+            return !allEvents.some(event => 
+                event.extendedProps.room_id == room.id &&
+                new Date(event.start) < selectedEnd &&
+                new Date(event.end) > selectedStart
+            );
+        });
+
+        // Add available rooms to select
+        availableRooms.forEach(room => {
+            const option = document.createElement('option');
+            option.value = room.id;
+            option.textContent = room.name;
+            roomSelect.appendChild(option);
+        });
+
+        if (availableRooms.length === 0) {
+            const option = document.createElement('option');
+            option.textContent = 'No rooms available';
+            roomSelect.appendChild(option);
+            document.getElementById('confirmBooking').disabled = true;
+        } else {
+            document.getElementById('confirmBooking').disabled = false;
+        }
+    }
+
+    document.getElementById('confirmBooking').addEventListener('click', function() {
+        const startTime = new Date(document.getElementById('bookingDate').value + 'T' + document.getElementById('startTime').value);
+        if (startTime < new Date()) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Cannot book for past times.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+
+        Swal.fire({
+            title: 'Confirm Booking',
+            text: "Are you sure you want to book this room?",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, book it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch("{{ url_for('user.book_room') }}", {
+                    method: 'POST',
+                    body: new FormData(document.getElementById('bookingForm')),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: data.message,
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    });
+                    window.location.reload();
+                });
+            }
+        });
+    });
+
+
+    function fetchBookings() {
+        fetch("{{ url_for('user.get_user_bookings') }}")
+        .then(response => response.json())
+        .then(data => {
+            updateBookingList(data.active_bookings, 'active');
+            updateBookingList(data.upcoming_bookings, 'upcoming');
+            updateBookingList(data.past_bookings, 'past');
+        });
+    }
+
+    function updateBookingList(bookings, elementId) {
+        const listElement = document.getElementById(elementId);
+        listElement.innerHTML = '';
+        
+        if (bookings.length === 0) {
+            const noBookingsMessage = document.createElement('p');
+            noBookingsMessage.className = 'text-muted text-center my-3';
+            switch(elementId) {
+                case 'active':
+                    noBookingsMessage.textContent = 'No active bookings';
+                    break;
+                case 'upcoming':
+                    noBookingsMessage.textContent = 'No upcoming bookings';
+                    break;
+                case 'past':
+                    noBookingsMessage.textContent = 'No past bookings';
+                    break;
+            }
+            listElement.appendChild(noBookingsMessage);
+        } else {
+            bookings.forEach(booking => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item';
+                li.style.borderLeft = `5px solid ${getUserColor(booking.user_id)}`;
+                li.innerHTML = `
+                    <strong>${booking.room_name}</strong><br>
+                    Date: ${booking.date}<br>
+                    Time: ${booking.start_time} - ${booking.end_time}<br>
+                    Booked by: ${booking.user_name}
+                `;
+                if (elementId === 'upcoming') {
+                    const cancelButton = document.createElement('button');
+                    cancelButton.className = 'btn btn-sm btn-danger float-end';
+                    cancelButton.textContent = 'Cancel';
+                    cancelButton.onclick = function() {
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: "You won't be able to revert this!",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'Yes, cancel it!'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                fetch(`/user/delete_booking/${booking.id}`, { method: 'POST' })
+                                .then(response => response.json())
+                                .then(data => {
+                                    Swal.fire(
+                                        'Cancelled!',
+                                        data.message,
+                                        'success'
+                                    );
+                                    calendar.refetchEvents();
+                                    fetchBookings();
+                                });
+                            }
+                        });
+                    };
+                    li.appendChild(cancelButton);
+                }
+                listElement.appendChild(li);
+            });
+        }
+    }
+
+    // Room filtering
+    document.querySelectorAll('.room-toggle').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            filterEvents();
+        });
+    });
+
+    function filterEvents() {
+        const selectedRoomIds = Array.from(document.querySelectorAll('.room-toggle:checked'))
+            .map(checkbox => checkbox.value);
+
+        const filteredEvents = allEvents.filter(event => 
+            selectedRoomIds.includes(event.extendedProps.room_id.toString())
+        );
+
+        calendar.removeAllEvents();
+        calendar.addEventSource(filteredEvents);
+    }
+
+    initializeCalendar();
+    fetchBookings();
+
+    // Booking Trends Chart
+    var bookingTrendsCtx = document.getElementById('bookingTrendsChart').getContext('2d');
+    var bookingTrendsChart = new Chart(bookingTrendsCtx, {
+        type: 'line',
+        data: {
+            labels: {{ booking_trends.dates | tojson }},
+            datasets: [{
+                label: 'Bookings',
+                data: {{ booking_trends.counts | tojson }},
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+    // Room Usage Chart
+    var roomUsageCtx = document.getElementById('roomUsageChart').getContext('2d');
+    var roomUsageChart = new Chart(roomUsageCtx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ room_usage.rooms | tojson }},
+            datasets: [{                                                
+                data: {{ room_usage.counts | tojson }},
+                backgroundColor: colors
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+});
+</script>
+{% endblock %}

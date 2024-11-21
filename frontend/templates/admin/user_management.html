@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}User Management{% endblock %}
+
+{% block content %}
+<div class="nk-content ">
+    <div class="container-fluid">
+        <div class="nk-content-inner">
+            <div class="nk-content-body">
+                <div class="nk-block-head nk-block-head-sm">
+                    <div class="nk-block-between">
+                        <div class="nk-block-head-content">
+                            <h3 class="nk-block-title page-title">User Management</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="nk-block">
+                    <div class="card card-bordered card-stretch">
+                        <div class="card-inner-group">
+                            <div class="card-inner p-0">
+                                <div class="nk-tb-list nk-tb-ulist">
+                                    <div class="nk-tb-item nk-tb-head">
+                                        <div class="nk-tb-col"><span class="sub-text">Name</span></div>
+                                        <div class="nk-tb-col tb-col-mb"><span class="sub-text">Email</span></div>
+                                        <div class="nk-tb-col tb-col-md"><span class="sub-text">Role</span></div>
+                                        <div class="nk-tb-col nk-tb-col-tools text-end">Actions</div>
+                                    </div>
+                                    {% for user in users %}
+                                    <div class="nk-tb-item">
+                                        <div class="nk-tb-col">
+                                            <span class="tb-lead">{{ user.name }}</span>
+                                        </div>
+                                        <div class="nk-tb-col tb-col-mb">
+                                            <span class="tb-amount">{{ user.email }}</span>
+                                        </div>
+                                        <div class="nk-tb-col tb-col-md">
+                                            <span class="tb-status text-{{ 'success' if user.is_admin else 'info' }}">{{ "Admin" if user.is_admin else "User" }}</span>
+                                        </div>
+                                        <div class="nk-tb-col nk-tb-col-tools">
+                                            <ul class=" gx-1">
+                                                <li>
+                                                    <div class="drodown">
+                                                        <a href="#" class="dropdown-toggle btn btn-icon btn-trigger" data-toggle="dropdown"><em class="icon ni ni-more-h"></em></a>
+                                                        <div class="dropdown-menu dropdown-menu-right">
+                                                            <ul class="link-list-opt no-bdr">
+                                                                <li><button type="button" class="view-bookings btn btn-primary" data-user-id="{{ user._id }}" data-user-name="{{ user.name }}">
+                                                                    <em class="icon ni ni-calendar-booking mr-1"></em> View Bookings
+                                                                </button></li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>  
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- User Bookings Modal -->
+<div class="modal fade" id="userBookingsModal" tabindex="-1" role="dialog" aria-labelledby="userBookingsLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userBookingsModalLabel"><em class="icon ni ni-calendar-booking"></em> <span id="userBookingsTitle"></span></h5>
+                <a href="#" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <em class="icon ni ni-cross"></em>
+                </a>
+            </div>
+            <div class="modal-body">
+                <div id="userBookingsList">
+                    <!-- Bookings will be populated here -->
+                </div>
+            </div>
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+
+    $(document).ready(function() {
+        document.addEventListener('DOMContentLoaded', function() {
+            var viewBookingsBtn = document.getElementById('view-bookings');
+            var userBookingsModal = new bootstrap.Modal(document.getElementById('userBookingsModal'));
+        
+            viewBookingsBtn.addEventListener('click', function() {
+                userBookingsModal.show();
+            });
+        });
+    
+        // Use event delegation for the view-bookings click evsent
+        $(document).on('click', '.view-bookings', function(e) {
+            var userId = $(this).data('user-id');
+            var userName = $(this).data('user-name');
+    
+            $('#userBookingsTitle').text(userName + " Bookings");
+            
+            // Fetch user bookings
+            $.ajax({
+                url: '/admin/get_user_bookings/' + userId,
+                method: 'GET',
+                success: function(data) {
+                    var bookingsList = $('#userBookingsList');
+                    bookingsList.empty();
+                    if (data.bookings && data.bookings.length === 0) {
+                        bookingsList.append('<div class="alert alert-info">No bookings found for this user.</div>');
+                    } else if (data.bookings && data.bookings.length > 0) {
+                        var html = '<ul class="nk-activity">';
+                        data.bookings.forEach(function(booking) {
+                            html += '<li class="nk-activity-item">';
+                            html += '<div class="nk-activity-data">';
+                            html += '<div class="label">' + (booking.room_name || 'N/A') + '</div>';
+                            html += '<span class="time">Date: ' + (booking.date || 'N/A') + '</span>';
+                            html += '<span class="time">Time: ' + (booking.start_time || 'N/A') + ' - ' + (booking.end_time || 'N/A') + '</span>';
+                            html += '</div>';
+                            html += '</li>';
+                        });
+                        html += '</ul>';
+                        bookingsList.append(html);
+                    } else {
+                        bookingsList.append('<div class="alert alert-warning">Invalid response from server.</div>');
+                    }
+                    
+                    // Show the modal
+                    var userBookingsModal = new bootstrap.Modal(document.getElementById('userBookingsModal'));
+                    userBookingsModal.show();
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.error('AJAX Error:', textStatus, errorThrown);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to fetch user bookings. Please try again later.',
+                    });
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Sign-Up
+{% endblock %}
+
+{% block content %}
+<div class="nk-content mt-0">
+    <div class="container-fluid">
+        <div class="nk-content-inner">
+            <div class="nk-content-body d-flex justify-content-center align-items-center">
+                <div class="nk-split-content nk-block-area nk-block-area-column nk-auth-container bg-white w-lg-45">
+                    <div class="absolute-top-right d-lg-none p-3 p-sm-5"><a href="#" class="toggle btn btn-white btn-icon btn-light"
+                            data-target="athPromo"><em class="icon ni ni-info"></em></a></div>
+                    <div class="nk-block nk-block-middle nk-auth-body mt-3">
+                        <div class="nk-block-head">
+                            <div class="nk-block-head-content">
+                                <h5 class="nk-block-title">Register</h5>    
+                                <div class="nk-block-des">
+                                    <p>Create New Account</p>
+                                </div>
+                            </div>
+                        </div>
+                        <form id="registerForm" method="POST">
+                            <div class="form-group"><label class="form-label" for="name">Name</label>
+                                <div class="form-control-wrap"><input type="text" class="form-control form-control-lg" id="name"
+                                        placeholder="Enter your name" name="name" required></div>
+                            </div>
+                            <div class="form-group"><label class="form-label" for="email">Email</label>
+                                <div class="form-control-wrap"><input type="email" class="form-control form-control-lg" id="email"
+                                        placeholder="Enter your email address" name="email" required></div>
+                            </div>
+                            <div class="form-group"><label class="form-label" for="password">Passcode</label>
+                                <div class="form-control-wrap"><a tabindex="-1" href="#"
+                                        class="form-icon form-icon-right passcode-switch lg" data-target="password"><em
+                                            class="passcode-icon icon-show icon ni ni-eye"></em><em
+                                            class="passcode-icon icon-hide icon ni ni-eye-off"></em></a><input type="password"
+                                        class="form-control form-control-lg" id="password" name="password" placeholder="Enter your passcode" required></div>
+                            </div>
+                            <div class="form-group">
+                                <div class="custom-control custom-control-xs custom-checkbox"><input type="checkbox"
+                                        class="custom-control-input" name="checkbox" id="checkbox"><label for="checkbox">I</label><label class="custom-control-label">
+                                        agree to Dashlite <a tabindex="-1" href="/demo2/pages/terms-policy.html">Privacy Policy</a>
+                                        &amp; <a tabindex="-1" href="/demo2/pages/terms-policy.html"> Terms.</a></label></div>
+                            </div>
+                            <div class="form-group"><button type="submit" class="btn btn-lg btn-primary btn-block">Register</button></div>
+                        </form>
+                        <div class="form-note-s2 pt-4"> Already have an account ? <a
+                                href="{{ url_for('auth.login') }}"><strong>Sign in instead</strong></a></div>
+                        <div class="text-center pt-4 pb-3">
+                            <h6 class="overline-title overline-title-sap"><span>OR</span></h6>
+                        </div>
+                        <ul class="nav justify-center gx-8">
+                            <li class="nav-item"><a class="link link-primary fw-normal py-2 px-3 fs-13px" href="#">Facebook</a></li>
+                            <li class="nav-item"><a class="link link-primary fw-normal py-2 px-3 fs-13px" href="#">Google</a></li>
+                        </ul>
+                    </div>
+                    <div class="nk-block nk-auth-footer">
+                        <div class="nk-block-between">
+                            <ul class="nav nav-sm">
+                                <li class="nav-item"><a class="link link-primary fw-normal py-2 px-3 fs-13px" href="#">Terms &amp;
+                                        Condition</a></li>
+                                <li class="nav-item"><a class="link link-primary fw-normal py-2 px-3 fs-13px" href="#">Privacy
+                                        Policy</a></li>
+                                <li class="nav-item"><a class="link link-primary fw-normal py-2 px-3 fs-13px" href="#">Help</a></li>
+                                <li class="nav-item dropup"><a
+                                        class="dropdown-toggle dropdown-indicator has-indicator link link-primary fw-normal py-2 px-3 fs-13px"
+                                        data-bs-toggle="dropdown" data-offset="0,10"><small>English</small></a>
+                                    <div class="dropdown-menu dropdown-menu-sm dropdown-menu-end">
+                                        <ul class="language-list">
+                                            <li><a href="#" class="language-item"><img src="/demo2/images/flags/english.png" alt=""
+                                                        class="language-flag"><span class="language-name">English</span></a></li>
+                                            <li><a href="#" class="language-item"><img src="/demo2/images/flags/spanish.png" alt=""
+                                                        class="language-flag"><span class="language-name">Español</span></a></li>
+                                            <li><a href="#" class="language-item"><img src="/demo2/images/flags/french.png" alt=""
+                                                        class="language-flag"><span class="language-name">Français</span></a></li>
+                                            <li><a href="#" class="language-item"><img src="/demo2/images/flags/turkey.png" alt=""
+                                                        class="language-flag"><span class="language-name">Türkçe</span></a></li>
+                                        </ul>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="mt-3 text-center">
+                            <p>© 2024 Conference room booking system. All Rights Reserved.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>  
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#registerForm').on('submit', function(e) {
+        e.preventDefault();
+        var formData = {
+            name: $('#name').val(),
+            email: $('#email').val(),
+            password: $('#password').val(),
+            checkbox: $('#checkbox').is(':checked')
+        };
+
+        if (!formData.checkbox) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Please agree to the Privacy Policy and Terms.'
+            });
+            return;
+        }
+
+        $.ajax({
+            url: "{{ url_for('auth.register') }}",
+            type: 'POST',
+            data: formData,
+            success: function(response) {
+                if (response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'Registration successful!.',
+                        confirmButtonText: 'Go to dashboard'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = "{{ url_for('user.dashboard') }}";
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Registration Failed',
+                        text: response.message
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                let errorMessage = 'An error occurred while processing your request.';
+                try {
+                    let jsonResponse = JSON.parse(xhr.responseText);
+                    errorMessage = jsonResponse.message || errorMessage;
+                } catch (e) {
+                    console.log("Error parsing JSON response:", e);
+                }
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Registration Failed',
+                    text: errorMessage
+                });
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

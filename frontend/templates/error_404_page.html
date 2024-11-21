@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}404 - Page Not Found{% endblock %}
+
+{% block content %}
+<div class="nk-content ">
+    <div class="container-fluid">
+        <div class="nk-content-inner">
+            <div class="nk-content-body">
+                <div class="nk-block-head nk-block-head-lg wide-xs mx-auto">
+                    <div class="nk-block-head-content text-center">
+                        <h1 class="nk-error-head">404</h1>
+                        <h3 class="nk-error-title">Oops! Why you're here?</h3>
+                        <p class="nk-error-text">We are very sorry for inconvenience. It looks like you're trying to access a page that either has been deleted or never existed.</p>
+                        {% if current_user.is_authenticated %}
+                            {% if current_user.is_admin %}
+                            <a href="{{ url_for('admin.dashboard') }}" class="btn btn-lg btn-primary mt-2">Back To Home</a>
+                            {% else %}
+                                <a href="{{ url_for('user.dashboard') }}" class="btn btn-lg btn-primary mt-2">Back To Home</a>
+                            {% endif %}
+                        {% else %}
+                            <a href="{{ url_for('auth.login') }}" class="btn btn-lg btn-primary mt-2">Back To Home</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

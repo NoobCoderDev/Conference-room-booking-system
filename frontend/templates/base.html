@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en" class="js">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="author" content="Softnio">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description"
+        content="A powerful and conceptual apps base dashboard template that especially build for developers and programmers.">
+    <!-- Fav Icon  -->
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.png') }}">
+    <!-- Page Title  -->
+    <title>{% block title %}Base Template{% endblock %}</title>
+    <!-- StyleSheets  -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashlite.css') }}">
+    <link id="skin-default" rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.css' rel='stylesheet' />
+    {% block extra_css %}{% endblock %}
+    <style>
+        .nk-sidebar {
+            top: 0;
+            left: 0;
+            bottom: 0;
+            margin: 0;
+            padding-top: 0;
+        }
+        .nk-sidebar-element.nk-sidebar-head {
+            padding-top: 1rem;
+        }
+        body {
+            padding-left: 0; /* Remove any default padding */
+        }
+    </style>
+</head>
+
+<body class="nk-body bg-lighter npc-default has-sidebar">
+<div class="nk-app-root">
+    <!-- Main wrapper -->
+    <div class="nk-main">   
+        <!-- Sidebar -->
+        <div class="nk-sidebar nk-sidebar-fixed is-dark sidebar-collapsed" data-content="sidebarMenu">
+            <div class="nk-sidebar-element nk-sidebar-head">
+                <div class="d-flex">
+                    <div class="nk-menu-trigger">
+                        <a href="#" class="nk-nav-toggle nk-quick-nav-icon d-xl-none" data-target="sidebarMenu"><em
+                                class="icon ni ni-arrow-left"></em></a>
+                    </div>
+                    <div class="nk-sidebar-brand ml-2">
+                        <a href="#" class="logo-link nk-sidebar-logo">
+                            <img class="logo-light logo-img" src="{{ url_for('static', filename='images/logo.png') }}"
+                                alt="logo">
+                        </a>
+                    </div>
+                </div>
+                <div class="nk-sidebar-element nk-sidebar-body">
+                    <div class="nk-sidebar-content">
+                        <div class="nk-sidebar-menu" data-simplebar>
+                            <ul class="nk-menu">
+                                {% if current_user.is_authenticated %}
+                                    {% if current_user.is_admin %}
+                                        <li class="nk-menu-item">
+                                            <a href="{{ url_for('admin.dashboard') }}" class="nk-menu-link">
+                                                <span class="nk-menu-icon ml-1"><em class="icon ni ni-dashboard-fill"></em></span>
+                                                <span class="nk-menu-text">Dashboard</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="{{ url_for('admin.room_management') }}" class="nk-menu-link">
+                                                <span class="nk-menu-icon ml-1"><em class="icon ni ni-building"></em></span>
+                                                <span class="nk-menu-text">Room Management</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="{{ url_for('admin.user_management') }}" class="nk-menu-link">
+                                                <span class="nk-menu-icon ml-1"><em class="icon ni ni-users-fill"></em></span>
+                                                <span class="nk-menu-text">User Management</span>
+                                            </a>
+                                        </li>
+                                    {% else %}
+                                        <li class="nk-menu-item">
+                                            <a href="{{ url_for('user.dashboard') }}" class="nk-menu-link">
+                                                <span class="nk-menu-icon ml-1"><em class="icon ni ni-dashboard"></em></span>
+                                                <span class="nk-menu-text">User Dashboard</span>
+                                            </a>
+                                        </li>
+                                        <li class="nk-menu-item">
+                                            <a href="{{ url_for('user.available_rooms') }}" class="nk-menu-link">
+                                                <span class="nk-menu-icon ml-1"><em class="icon ni ni-calendar-booking"></em></span>
+                                                <span class="nk-menu-text">Available Rooms</span>
+                                            </a>
+                                        </li>
+                                    {% endif %}
+                                    <li class="nk-menu-item">
+                                        <a href="{{ url_for('auth.logout') }}" class="nk-menu-link">
+                                            <span class="nk-menu-icon ml-1"><em class="icon ni ni-signout"></em></span>
+                                            <span class="nk-menu-text">Logout</span>
+                                        </a>
+                                    </li>
+                                {% else %}
+                                    <li class="nk-menu-item">
+                                        <a href="{{ url_for('auth.login') }}" class="nk-menu-link sign-in">
+                                            <span class="nk-menu-icon ml-1"><em class="icon ni ni-user-circle"></em></span>
+                                            <span class="nk-menu-text">Sign In</span>
+                                        </a>
+                                    </li>
+                                    <li class="nk-menu-item">
+                                        <a href="{{ url_for('auth.register') }}" class="nk-menu-link sign-up">
+                                            <span class="nk-menu-icon ml-1"><em class="icon ni ni-user-add"></em></span>
+                                            <span class="nk-menu-text">Sign Up</span>
+                                        </a>
+                                    </li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- sidebar @end-->
+        <!-- main @s -->
+        <!-- wrap @s -->
+        <div class="nk-wrap pt-xl-0">
+            <!-- main header @s -->
+            <div class="nk-header nk-header-fixed is-light">
+                <div class="container-fluid">
+                    <div class="nk-header-wrap">
+                        <div class="nk-menu-trigger d-xl-none ms-n1">
+                            <a href="#" class="nk-nav-toggle nk-quick-nav-icon" data-target="sidebarMenu"><em
+                                    class="icon ni ni-menu"></em>
+                            </a>
+                        </div>
+                        <div class="nk-header-brand d-xl-none">
+                            <a href="#" class="logo-link">
+                                <img class="logo-light logo-img" src="{{ url_for('static', filename='images/logo.png') }}"
+                                    srcset="{{ url_for('static', filename='images/logo.png') }} 2x" alt="logo">
+                                <img class="logo-dark logo-img" src="{{ url_for('static', filename='images/logo.png') }}"
+                                    srcset="{{ url_for('static', filename='images/logo.png') }} 2x" alt="logo-dark">
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- main header @e -->
+            <!-- content @s -->
+            <div class="nk-content pt-0">
+                <div class="container-fluid">
+                    <div class="nk-content-inner">
+                        <div class="nk-content-body">
+                            {% block content %}
+                            <!-- Your page content goes here -->
+                            {% endblock %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- content @e -->
+            <!-- footer @s -->
+            {% if current_user.is_authenticated %}
+            <div class="nk-footer">
+                <div class="container-fluid">
+                    <div class="nk-footer-wrap">
+                        <div class="nk-footer-copyright"> &copy; 2024 Conference room booking system. All Rights Reserved.
+                        </div>
+                        <div class="nk-footer-links">
+                            <ul class="nav nav-sm">
+                                <li class="nav-item"><a class="nav-link" href="#">Terms</a></li>
+                                <li class="nav-item"><a class="nav-link" href="#">Privacy</a></li>
+                                <li class="nav-item"><a class="nav-link" href="#">Help</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            <!-- footer @e -->
+        </div>
+        <!-- wrap @e -->
+    </div>
+    <!-- main @e -->
+</div>
+<!-- app-root @e -->
+
+<!-- JavaScript -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{{ url_for('static', filename='js/bundle.js') }}"></script>
+<script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+{% block extra_js %}{% endblock %}
+</body>
+
+</html>
