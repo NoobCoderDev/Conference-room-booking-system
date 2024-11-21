@@ -28,7 +28,7 @@ The Conference Room Booking System is a web-based application designed to stream
 ## Installation
 
 1. Clone the repository:
-   git clone https://github.com/yourusername/conference-room-booking.git
+   git clone https://github.com/NoobCoderDev/conference-room-booking.git
 
 2. Navigate to the project directory:
    cd conference-room-booking
